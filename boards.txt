@@ -1,0 +1,29 @@
+menu.serial_buffer=Serial Buffer Size
+
+lp_mspm0c1104.name=LP-MSPM0C1104
+
+lp_mspm0c1104.upload.maximum_size=16384
+lp_mspm0c1104.upload.maximum_data_size=1024
+lp_mspm0c1104.upload.tool=openocd
+lp_mspm0c1104.upload.tool.default=openocd
+lp_mspm0c1104.upload.protocol=swd
+
+lp_mspm0c1104.build.mcu=MSPM0C1104
+lp_mspm0c1104.build.f_cpu=24000000L
+lp_mspm0c1104.build.board=LP_MSPM0C1104
+lp_mspm0c1104.build.core=arduino
+lp_mspm0c1104.build.variant=LP_MSPM0C1104
+lp_mspm0c1104.build.ldscript=mspm0c1104.lds
+lp_mspm0c1104.build.extra_flags=-D__MSPM0C1104__ -DARDUINO_ARCH_MSPM0 -DCONFIG_LP_MSPM0C1104
+lp_mspm0c1104.build.serial_tx_buffer=16
+lp_mspm0c1104.build.serial_rx_buffer=16
+
+lp_mspm0c1104.menu.serial_buffer.small=Small (TX:16 / RX:16)
+lp_mspm0c1104.menu.serial_buffer.small.build.serial_tx_buffer=16
+lp_mspm0c1104.menu.serial_buffer.small.build.serial_rx_buffer=16
+lp_mspm0c1104.menu.serial_buffer.tiny=Tiny (TX:0 / RX:16)
+lp_mspm0c1104.menu.serial_buffer.tiny.build.serial_tx_buffer=0
+lp_mspm0c1104.menu.serial_buffer.tiny.build.serial_rx_buffer=16
+lp_mspm0c1104.menu.serial_buffer.medium=Medium (TX:32 / RX:32)
+lp_mspm0c1104.menu.serial_buffer.medium.build.serial_tx_buffer=32
+lp_mspm0c1104.menu.serial_buffer.medium.build.serial_rx_buffer=32

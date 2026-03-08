@@ -1,0 +1,63 @@
+name=Texas Instruments MSPM0 Arduino Core
+version=0.1.0
+
+pluggable_discovery.required=builtin:serial-discovery
+pluggable_monitor.required.serial=builtin:serial-monitor
+
+compiler.path={runtime.tools.arm-none-eabi-gcc.path}/bin/
+compiler.c.cmd=arm-none-eabi-gcc
+compiler.cpp.cmd=arm-none-eabi-g++
+compiler.S.cmd=arm-none-eabi-gcc
+compiler.ar.cmd=arm-none-eabi-gcc-ar
+compiler.objcopy.cmd=arm-none-eabi-objcopy
+compiler.size.cmd=arm-none-eabi-size
+compiler.elf2hex.flags=-O ihex
+compiler.elf2bin.flags=-O binary
+
+build.flags.common=-mcpu=cortex-m0plus -mthumb -mfloat-abi=soft -ffunction-sections -fdata-sections -fno-common -flto -g3 -Os -Wall -Wextra -Werror=return-type -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DF_CPU={build.f_cpu} -DSERIAL_TX_BUFFER_SIZE={build.serial_tx_buffer} -DSERIAL_RX_BUFFER_SIZE={build.serial_rx_buffer} {build.extra_flags}
+build.flags.c={build.flags.common} -std=gnu11
+build.flags.cpp={build.flags.common} -std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics
+build.flags.ld=-mcpu=cortex-m0plus -mthumb -mfloat-abi=soft -flto -Wl,--gc-sections -Wl,-Map,{build.path}/{build.project_name}.map --specs=nano.specs
+
+compiler.c.flags={build.flags.c}
+compiler.cpp.flags={build.flags.cpp}
+compiler.S.flags={build.flags.c}
+compiler.c.elf.flags={build.flags.ld}
+compiler.ar.flags=rcs
+compiler.libraries.ldflags=
+
+build.includes=-I{build.core.path} -I{build.variant.path} -iquote {runtime.platform.path}/ArduinoCore-API/api -isystem {runtime.platform.path}/mspm0-sdk/source -isystem {runtime.platform.path}/mspm0-sdk/source/third_party/CMSIS/Core/Include
+
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} {build.includes} {includes} -c "{source_file}" -o "{object_file}"
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {build.includes} {includes} -c "{source_file}" -o "{object_file}"
+recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} {build.includes} {includes} -c "{source_file}" -o "{object_file}"
+
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} "{archive_file_path}" "{object_file}"
+
+recipe.c.combine.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.c.elf.flags} -T{build.variant.path}/{build.ldscript} -o "{build.path}/{build.project_name}.elf" {object_files} -Wl,--start-group {compiler.libraries.ldflags} "{archive_file_path}" -lm -lc -lgcc -lnosys -Wl,--end-group
+recipe.objcopy.hex.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.elf2hex.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
+recipe.objcopy.bin.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.elf2bin.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
+recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
+recipe.size.regex=^(?:\.text|\.data|\.rodata)\s+(\d+).*
+recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+(\d+).*
+
+recipe.output.tmp_file={build.project_name}.elf
+recipe.output.save_file={build.project_name}.elf
+
+# ------------------------------------------------------------------
+# Upload / Program via OpenOCD
+# ------------------------------------------------------------------
+tools.openocd.path={runtime.tools.openocd.path}
+tools.openocd.cmd=bin/openocd
+
+tools.openocd.upload.params.verbose=-d2
+tools.openocd.upload.params.quiet=-d0
+tools.openocd.upload.pattern="{path}/{cmd}" {upload.verbose} -s "{path}/share/openocd/scripts/" -f board/ti_mspm0_launchpad.cfg -c "program {{build.path}/{build.project_name}.elf} verify reset exit"
+
+tools.openocd.program.params.verbose=-d2
+tools.openocd.program.params.quiet=-d0
+tools.openocd.program.pattern="{path}/{cmd}" {program.verbose} -s "{path}/share/openocd/scripts/" -f "interface/{protocol}.cfg" -c "adapter speed 10000; transport select swd" -f target/ti_mspm0.cfg -c "program {{build.path}/{build.project_name}.elf} verify reset exit"
+
+tools.openocd.erase.params.verbose=-d2
+tools.openocd.erase.params.quiet=-d0
+tools.openocd.erase.pattern="{path}/{cmd}" {erase.verbose} -s "{path}/share/openocd/scripts/" -f "interface/{protocol}.cfg" -c "adapter speed 10000; transport select swd" -f target/ti_mspm0.cfg -c "init; halt; flash erase_address 0x00000000 {upload.maximum_size}; shutdown"

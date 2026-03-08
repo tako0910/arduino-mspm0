@@ -1,0 +1,102 @@
+#include "variant.h"
+
+#include <stdint.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+const PinDescription g_APinDescription[PINS_COUNT] = {
+    {GPIOA, DL_GPIO_PIN_26, 26, IOMUX_PINCM27, 1, PWM_TIMER_TIMG8, 0, IOMUX_PINCM27_PF_TIMG8_CCP0, DL_GPIO_PIN_26_EDGE_DISABLE, DL_GPIO_PIN_26_EDGE_RISE, DL_GPIO_PIN_26_EDGE_FALL, DL_GPIO_PIN_26_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_27, 27, IOMUX_PINCM28, 0, PWM_TIMER_TIMG8, 1, IOMUX_PINCM28_PF_TIMG8_CCP1, DL_GPIO_PIN_27_EDGE_DISABLE, DL_GPIO_PIN_27_EDGE_RISE, DL_GPIO_PIN_27_EDGE_FALL, DL_GPIO_PIN_27_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_24, 24, IOMUX_PINCM25, 3, PWM_TIMER_TIMG14, 1, IOMUX_PINCM25_PF_TIMG14_CCP1, DL_GPIO_PIN_24_EDGE_DISABLE, DL_GPIO_PIN_24_EDGE_RISE, DL_GPIO_PIN_24_EDGE_FALL, DL_GPIO_PIN_24_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_28, 28, IOMUX_PINCM29, 5, PWM_TIMER_TIMA0, 0, IOMUX_PINCM29_PF_TIMA0_CCP0, DL_GPIO_PIN_28_EDGE_DISABLE, DL_GPIO_PIN_28_EDGE_RISE, DL_GPIO_PIN_28_EDGE_FALL, DL_GPIO_PIN_28_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_6, 6, IOMUX_PINCM7, 0xFF, PWM_TIMER_TIMA0, 1, IOMUX_PINCM7_PF_TIMA0_CCP1, DL_GPIO_PIN_6_EDGE_DISABLE, DL_GPIO_PIN_6_EDGE_RISE, DL_GPIO_PIN_6_EDGE_FALL, DL_GPIO_PIN_6_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_22, 22, IOMUX_PINCM23, 4, PWM_TIMER_TIMA0, 1, IOMUX_PINCM23_PF_TIMA0_CCP1, DL_GPIO_PIN_22_EDGE_DISABLE, DL_GPIO_PIN_22_EDGE_RISE, DL_GPIO_PIN_22_EDGE_FALL, DL_GPIO_PIN_22_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_11, 11, IOMUX_PINCM12, 0xFF, PWM_TIMER_NONE, 0, 0, DL_GPIO_PIN_11_EDGE_DISABLE, DL_GPIO_PIN_11_EDGE_RISE, DL_GPIO_PIN_11_EDGE_FALL, DL_GPIO_PIN_11_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_0, 0, IOMUX_PINCM1, 0xFF, PWM_TIMER_TIMG8, 0, IOMUX_PINCM1_PF_TIMG8_CCP0, DL_GPIO_PIN_0_EDGE_DISABLE, DL_GPIO_PIN_0_EDGE_RISE, DL_GPIO_PIN_0_EDGE_FALL, DL_GPIO_PIN_0_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_23, 23, IOMUX_PINCM24, 0xFF, PWM_TIMER_TIMG14, 0, IOMUX_PINCM24_PF_TIMG14_CCP0, DL_GPIO_PIN_23_EDGE_DISABLE, DL_GPIO_PIN_23_EDGE_RISE, DL_GPIO_PIN_23_EDGE_FALL, DL_GPIO_PIN_23_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_2, 2, IOMUX_PINCM3, 0xFF, PWM_TIMER_TIMG8, 1, IOMUX_PINCM3_PF_TIMG8_CCP1, DL_GPIO_PIN_2_EDGE_DISABLE, DL_GPIO_PIN_2_EDGE_RISE, DL_GPIO_PIN_2_EDGE_FALL, DL_GPIO_PIN_2_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_4, 4, IOMUX_PINCM5, 0xFF, PWM_TIMER_NONE, 0, 0, DL_GPIO_PIN_4_EDGE_DISABLE, DL_GPIO_PIN_4_EDGE_RISE, DL_GPIO_PIN_4_EDGE_FALL, DL_GPIO_PIN_4_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_18, 18, IOMUX_PINCM19, 7, PWM_TIMER_TIMA0, 3, IOMUX_PINCM19_PF_TIMA0_CCP3, DL_GPIO_PIN_18_EDGE_DISABLE, DL_GPIO_PIN_18_EDGE_RISE, DL_GPIO_PIN_18_EDGE_FALL, DL_GPIO_PIN_18_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_17, 17, IOMUX_PINCM18, 9, PWM_TIMER_TIMA0, 2, IOMUX_PINCM18_PF_TIMA0_CCP2, DL_GPIO_PIN_17_EDGE_DISABLE, DL_GPIO_PIN_17_EDGE_RISE, DL_GPIO_PIN_17_EDGE_FALL, DL_GPIO_PIN_17_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_16, 16, IOMUX_PINCM17, 8, PWM_TIMER_TIMG14, 0, IOMUX_PINCM17_PF_TIMG14_CCP0, DL_GPIO_PIN_16_EDGE_DISABLE, DL_GPIO_PIN_16_EDGE_RISE, DL_GPIO_PIN_16_EDGE_FALL, DL_GPIO_PIN_16_EDGE_RISE_FALL},
+    {GPIOA, DL_GPIO_PIN_25, 25, IOMUX_PINCM26, 2, PWM_TIMER_TIMG14, 3, IOMUX_PINCM26_PF_TIMG14_CCP3, DL_GPIO_PIN_25_EDGE_DISABLE, DL_GPIO_PIN_25_EDGE_RISE, DL_GPIO_PIN_25_EDGE_FALL, DL_GPIO_PIN_25_EDGE_RISE_FALL},
+};
+
+extern "C" void initVariant(void)
+{
+}
+
+extern "C" {
+extern char _end;
+extern uint32_t __StackTop;
+}
+
+extern "C" void _exit(int status)
+{
+    (void) status;
+    while (1) {
+    }
+}
+
+extern "C" int _close(int file)
+{
+    (void) file;
+    return -1;
+}
+
+extern "C" int _fstat(int file, struct stat *st)
+{
+    (void) file;
+    if (st != nullptr) {
+        st->st_mode = S_IFCHR;
+    }
+    return 0;
+}
+
+extern "C" int _isatty(int file)
+{
+    (void) file;
+    return 1;
+}
+
+extern "C" int _lseek(int file, int ptr, int dir)
+{
+    (void) file;
+    (void) ptr;
+    (void) dir;
+    return 0;
+}
+
+extern "C" int _read(int file, char *ptr, int len)
+{
+    (void) file;
+    (void) ptr;
+    (void) len;
+    return 0;
+}
+
+extern "C" int _write(int file, char *ptr, int len)
+{
+    (void) file;
+    (void) ptr;
+    return len;
+}
+
+extern "C" caddr_t _sbrk(int incr)
+{
+    static char *heap_end;
+    const uintptr_t limit = ((uintptr_t) &__StackTop) - 128U;
+    char *previous;
+
+    if (heap_end == nullptr) {
+        heap_end = &_end;
+    }
+
+    previous = heap_end;
+    if (((uintptr_t) (heap_end + incr)) > limit) {
+        return (caddr_t) -1;
+    }
+
+    heap_end += incr;
+    return (caddr_t) previous;
+}

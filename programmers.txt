@@ -1,0 +1,11 @@
+xds110.name=TI XDS110
+xds110.communication=usb
+xds110.protocol=xds110
+xds110.program.tool=openocd
+xds110.program.tool.default=openocd
+
+cmsis_dap.name=CMSIS-DAP
+cmsis_dap.communication=usb
+cmsis_dap.protocol=cmsis-dap
+cmsis_dap.program.tool=openocd
+cmsis_dap.program.tool.default=openocd

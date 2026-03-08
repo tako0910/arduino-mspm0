@@ -1,0 +1,95 @@
+name: Bug Report
+description: Report a bug in the MSPM0 Arduino Core
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+        Please search [existing issues](https://github.com/tako0910/arduino-mspm0/issues) before filing a new one.
+  - type: dropdown
+    id: board
+    attributes:
+      label: Board
+      options:
+        - LP-MSPM0C1104
+        - Standalone MSPM0C1104 (custom hardware)
+    validations:
+      required: true
+  - type: input
+    id: core_version
+    attributes:
+      label: Core version
+      description: "Version shown in Boards Manager (e.g. 0.1.0)"
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: ide
+    attributes:
+      label: IDE and version
+      description: "e.g. Arduino IDE 2.3.4, arduino-cli 1.1.0, PlatformIO"
+      placeholder: "Arduino IDE 2.3.4"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - macOS
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: What happened and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to trigger the bug.
+      placeholder: |
+        1. Open example sketch ...
+        2. Compile / upload ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Sketch
+      description: Minimal sketch that reproduces the issue.
+      render: cpp
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error / debug output
+      description: Compile errors, upload errors, or serial output.
+      render: plain
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Screenshots, wiring diagrams, SWD probe model, etc.
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I have searched existing issues for duplicates.
+          required: true
+        - label: I have tested with the latest core version.
+          required: true

@@ -1,0 +1,94 @@
+# Arduino Core for MSPM0 Series
+
+Arduino core for Texas Instruments MSPM0 series MCUs.
+
+## Supported Hardware
+
+This repository currently supports `LP-MSPM0C1104` only.
+You can also program a standalone `MSPM0C1104` IC via SWD using a
+CMSIS-DAP or other debug probe.
+
+## Limitations
+
+- `Wire` is controller-only
+- `SPI` is controller-only
+- SPI chip select is sketch-controlled
+- `tone()` is blocking and requires a non-zero duration
+- `noTone()` only drives the pin low
+
+## Installation
+
+Install via Arduino IDE Boards Manager:
+
+1. Open `Preferences`.
+2. Add this URL to `Additional Boards Manager URLs`:
+
+```text
+https://raw.githubusercontent.com/tako0910/arduino-mspm0/master/package_ti_mspm0_index.json
+```
+
+3. Open `Tools > Board > Boards Manager`.
+4. Search for `Texas Instruments MSPM0 Arduino Core`.
+5. Install the package.
+
+## Upload
+
+Upload uses OpenOCD over SWD. The LP-MSPM0C1104 LaunchPad has an onboard
+XDS110 debug probe that works out of the box:
+
+To use a different SWD probe, select a programmer under
+`Tools > Programmer` and upload via `Sketch > Upload Using Programmer`.
+
+Available programmers:
+
+- `TI XDS110` — onboard the LaunchPad
+- `CMSIS-DAP` — any CMSIS-DAP / DAPLink compatible probe
+
+## Board Options
+
+The board definition currently provides these menus:
+
+- `Serial Buffer Size`
+  - `Small (TX:16 / RX:16)`
+  - `Tiny (TX:0 / RX:16)`
+  - `Medium (TX:32 / RX:32)`
+
+## Pin Mapping
+
+| Arduino | MCU pin | Notes |
+| --- | --- | --- |
+| `D0` | `PA26` | `Serial RX`, `A1`, PWM |
+| `D1` | `PA27` | `Serial TX`, `A0`, PWM |
+| `D2` | `PA24` | `A3`, PWM |
+| `D3` | `PA28` | `A5`, PWM |
+| `D4` | `PA6` | `SPI SCK`, PWM |
+| `D5` | `PA22` | `LED_BUILTIN`, `A4`, PWM |
+| `D6` | `PA11` | `Wire SCL` |
+| `D7` | `PA0` | `Wire SDA`, PWM |
+| `D8` | `PA23` | GPIO, PWM |
+| `D9` | `PA2` | software `SPI SS`, PWM |
+| `D10` | `PA4` | `SPI MISO` |
+| `D11` | `PA18` | `SPI MOSI`, `A7`, PWM |
+| `D12` | `PA17` | `A9`, PWM |
+| `D13` | `PA16` | `A8`, PWM |
+| `D14` | `PA25` | `A2`, PWM |
+
+Defaults:
+
+- `Serial`
+  - RX: `D0` (`PA26`)
+  - TX: `D1` (`PA27`)
+- `Wire`
+  - SDA: `D7` (`PA0`)
+  - SCL: `D6` (`PA11`)
+- `SPI`
+  - MOSI: `D11` (`PA18`)
+  - MISO: `D10` (`PA4`)
+  - SCK: `D4` (`PA6`)
+- `LED_BUILTIN`: `D5` (`PA22`)
+
+## AI Usage
+
+This Arduino port was primarily developed by Codex (GPT-5.4), with
+Claude Code (Opus 4.6) as secondary contributor. Code review was
+performed by both models along with Gemini 3 Flash.
