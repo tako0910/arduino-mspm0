@@ -1,5 +1,5 @@
 name=Texas Instruments MSPM0 Arduino Core
-version=0.1.0
+version=0.1.1
 
 pluggable_discovery.required=builtin:serial-discovery
 pluggable_monitor.required.serial=builtin:serial-monitor

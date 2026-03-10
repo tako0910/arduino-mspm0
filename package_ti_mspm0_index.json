@@ -11,12 +11,12 @@
         {
           "name": "Texas Instruments MSPM0 Arduino Core",
           "architecture": "mspm0",
-          "version": "0.1.0",
+          "version": "0.1.1",
           "category": "Contributed",
-          "url": "https://github.com/tako0910/arduino-mspm0/releases/download/0.1.0/core-ti-mspm0-0.1.0.tar.bz2",
-          "archiveFileName": "core-ti-mspm0-0.1.0.tar.bz2",
-          "checksum": "SHA-256:eb99ef2db2af38333f2ab3b7c5d27d35474c2e9aff4646e73e31ea89d53a2e0e",
-          "size": 957748,
+          "url": "https://github.com/tako0910/arduino-mspm0/releases/download/0.1.1/core-ti-mspm0-0.1.1.tar.bz2",
+          "archiveFileName": "core-ti-mspm0-0.1.1.tar.bz2",
+          "checksum": "SHA-256:958038681e33049682db91f3ea62c8ddf62d1349aa6b5bc438da742c40a6f6c6",
+          "size": 958019,
           "boards": [
             {
               "name": "LP-MSPM0C1104"
