@@ -31,6 +31,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 *****************************************************************************/
+/* Generate a link error if heap and stack don't fit into SRAM. */
 _Min_Heap_Size  = 0;
 _Min_Stack_Size = 0x80;
 
@@ -174,18 +175,24 @@ SECTIONS
     } > REGION_NOINIT :bss
 
     .heap : {
+        __HeapBase = .;
         __heap_start__ = .;
         end = __heap_start__;
         _end = end;
         __end = end;
+        . += _Min_Heap_Size;
         KEEP (*(.heap))
         __heap_end__ = .;
         __HeapLimit = __heap_end__;
     } > REGION_HEAP :bss
 
-    .stack (NOLOAD) : ALIGN(0x8) {
+    __StackTop = ORIGIN(REGION_STACK) + LENGTH(REGION_STACK);
+    __StackLimit = __StackTop - _Min_Stack_Size;
+
+    .stack __StackLimit (NOLOAD) : ALIGN(0x8) {
         _stack = .;
         KEEP(*(.stack))
+        . += _Min_Stack_Size;
     } > REGION_STACK :bss
 
     .BCRConfig :
@@ -193,6 +200,6 @@ SECTIONS
         KEEP(*(.BCRConfig))
     } > BCR_CONFIG :text
 
-    __StackTop = ORIGIN(REGION_STACK) + LENGTH(REGION_STACK);
     PROVIDE(__stack = __StackTop);
+    ASSERT(__HeapLimit <= __StackLimit, "region SRAM overflowed with heap and stack")
 }

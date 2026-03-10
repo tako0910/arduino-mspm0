@@ -23,9 +23,7 @@ _sbrk:
 1:
     mov     r4, r2
     adds    r3, r2, r0
-    ldr     r2, =__StackTop
-    ldr     r2, [r2]
-    subs    r2, r2, #128
+    ldr     r2, =__StackLimit
     cmp     r3, r2
     bhi     2f
     str     r3, [r1]
