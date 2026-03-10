@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -161,7 +162,11 @@ EXCLUDED_SUFFIXES = {
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Build a Boards Manager archive and package index."
+        description="Build a Boards Manager release: update version, build archive, commit, and tag."
+    )
+    parser.add_argument(
+        "version",
+        help="Release version (e.g. 0.1.1).",
     )
     parser.add_argument(
         "--repo-root",
@@ -173,43 +178,7 @@ def parse_args() -> argparse.Namespace:
         "--output-dir",
         type=pathlib.Path,
         default=None,
-        help="Directory for the generated archive and package index.",
-    )
-    parser.add_argument(
-        "--index-path",
-        type=pathlib.Path,
-        default=None,
-        help="Path for the generated package index JSON.",
-    )
-    parser.add_argument(
-        "--version",
-        default=None,
-        help="Platform version. Defaults to the version from platform.txt.",
-    )
-    parser.add_argument(
-        "--archive-url",
-        default=None,
-        help="Public URL for the archive. Defaults to a file:// URL for local testing.",
-    )
-    parser.add_argument(
-        "--archive-name",
-        default=None,
-        help="Archive file name. Defaults to core-ti-mspm0-<version>.tar.bz2.",
-    )
-    parser.add_argument(
-        "--website-url",
-        default=None,
-        help="Package website URL. Defaults to the git origin converted to HTTPS.",
-    )
-    parser.add_argument(
-        "--maintainer",
-        default="tako0910",
-        help="Maintainer name for the package index.",
-    )
-    parser.add_argument(
-        "--email",
-        default=None,
-        help="Maintainer email for the package index.",
+        help="Directory for the generated archive. Defaults to <repo>/dist.",
     )
     parser.add_argument(
         "--gcc-version",
@@ -226,23 +195,29 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def read_platform_version(repo_root: pathlib.Path) -> str:
-    for line in (repo_root / "platform.txt").read_text(encoding="utf-8").splitlines():
-        if line.startswith("version="):
-            return line.split("=", 1)[1].strip()
-    raise RuntimeError("platform.txt does not contain a version= entry")
+def git_run(repo_root: pathlib.Path, *args: str, **kwargs) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["git", "-C", str(repo_root), *args],
+        check=True,
+        capture_output=True,
+        text=True,
+        **kwargs,
+    )
 
 
-def git_origin_https(repo_root: pathlib.Path) -> str | None:
+def check_working_tree_clean(repo_root: pathlib.Path) -> None:
+    result = git_run(repo_root, "status", "--porcelain")
+    if result.stdout.strip():
+        print("error: working tree has uncommitted changes:", file=sys.stderr)
+        print(result.stdout, file=sys.stderr)
+        raise SystemExit(1)
+
+
+def git_origin_https(repo_root: pathlib.Path) -> str:
     try:
-        remote = subprocess.run(
-            ["git", "-C", str(repo_root), "remote", "get-url", "origin"],
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
+        remote = git_run(repo_root, "remote", "get-url", "origin").stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
-        return None
+        raise RuntimeError("Could not determine git origin URL.")
 
     if remote.startswith("git@github.com:"):
         path = remote.removeprefix("git@github.com:")
@@ -250,13 +225,22 @@ def git_origin_https(repo_root: pathlib.Path) -> str | None:
             path = path[:-4]
         return f"https://github.com/{path}"
 
-    if remote.startswith("https://github.com/") and remote.endswith(".git"):
+    if remote.startswith("https://") and remote.endswith(".git"):
         return remote[:-4]
 
     if remote.startswith("https://"):
         return remote
 
-    return None
+    raise RuntimeError(f"Unsupported git remote format: {remote}")
+
+
+def update_platform_version(repo_root: pathlib.Path, version: str) -> None:
+    platform_txt = repo_root / "platform.txt"
+    text = platform_txt.read_text(encoding="utf-8")
+    new_text = re.sub(r"^version=.*$", f"version={version}", text, count=1, flags=re.MULTILINE)
+    if new_text == text:
+        raise RuntimeError("platform.txt does not contain a version= entry")
+    platform_txt.write_text(new_text, encoding="utf-8")
 
 
 def should_exclude(relative_path: pathlib.Path) -> bool:
@@ -307,10 +291,6 @@ def sha256_digest(path: pathlib.Path) -> str:
     return digest.hexdigest()
 
 
-def file_url(path: pathlib.Path) -> str:
-    return path.resolve().as_uri()
-
-
 def resolve_tool_systems(tool_name: str, version: str) -> list[dict[str, str]]:
     versions = TOOL_RELEASES.get(tool_name)
     if versions is None:
@@ -334,14 +314,12 @@ def build_index(
     checksum: str,
     size: int,
     website_url: str,
-    maintainer: str,
-    email: str | None,
     gcc_version: str,
     openocd_version: str,
 ) -> dict:
     package: dict[str, object] = {
         "name": PACKAGE_NAME,
-        "maintainer": maintainer,
+        "maintainer": "tako0910",
         "websiteURL": website_url,
         "help": {"online": website_url},
         "platforms": [
@@ -382,36 +360,38 @@ def build_index(
             },
         ],
     }
-    if email:
-        package["email"] = email
 
     return {"packages": [package]}
 
 
 def main() -> int:
     args = parse_args()
+    version = args.version
     repo_root = args.repo_root.resolve()
-    version = args.version or read_platform_version(repo_root)
     output_dir = (
         args.output_dir.resolve()
         if args.output_dir is not None
         else (repo_root / "dist").resolve()
     )
-    archive_name = args.archive_name or f"core-ti-mspm0-{version}.tar.bz2"
+
+    # 1. Check for uncommitted changes
+    print("Checking working tree...")
+    check_working_tree_clean(repo_root)
+
+    # 2. Derive URLs from git origin
+    website_url = git_origin_https(repo_root)
+    archive_name = f"core-ti-mspm0-{version}.tar.bz2"
+    archive_url = f"{website_url}/releases/download/{version}/{archive_name}"
+
+    # 3. Update platform.txt version
+    print(f"Updating platform.txt version to {version}...")
+    update_platform_version(repo_root, version)
+
+    # 4. Build archive
     archive_path = output_dir / archive_name
     archive_root_name = f"{PACKAGE_NAME}-{ARCHITECTURE}-{version}"
-    index_path = (
-        args.index_path.resolve()
-        if args.index_path is not None
-        else (repo_root / "package_ti_mspm0_index.json").resolve()
-    )
 
-    website_url = args.website_url or git_origin_https(repo_root)
-    if not website_url:
-        raise RuntimeError(
-            "Could not determine a website URL. Pass --website-url explicitly."
-        )
-
+    print("Building archive...")
     with tempfile.TemporaryDirectory(prefix="mspm0-package-") as temp_dir_name:
         temp_dir = pathlib.Path(temp_dir_name)
         staging_dir = temp_dir / "platform"
@@ -421,8 +401,10 @@ def main() -> int:
 
     checksum = sha256_digest(archive_path)
     size = archive_path.stat().st_size
-    archive_url = args.archive_url or file_url(archive_path)
 
+    # 5. Update package index JSON
+    index_path = repo_root / "package_ti_mspm0_index.json"
+    print(f"Updating {index_path.name}...")
     index = build_index(
         version=version,
         archive_name=archive_name,
@@ -430,20 +412,25 @@ def main() -> int:
         checksum=checksum,
         size=size,
         website_url=website_url,
-        maintainer=args.maintainer,
-        email=args.email,
         gcc_version=args.gcc_version,
         openocd_version=args.openocd_version,
     )
-
-    index_path.parent.mkdir(parents=True, exist_ok=True)
     index_path.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
 
-    print(f"archive: {archive_path}")
-    print(f"package index: {index_path}")
-    print(f"archive url: {archive_url}")
+    # 6. Commit and tag
+    print("Committing...")
+    git_run(repo_root, "add", "platform.txt", "package_ti_mspm0_index.json")
+    git_run(repo_root, "commit", "-m", f"Version {version}")
+    print(f"Tagging {version}...")
+    git_run(repo_root, "tag", version)
+
+    print()
+    print(f"archive:  {archive_path}")
+    print(f"url:      {archive_url}")
     print(f"checksum: SHA-256:{checksum}")
-    print(f"size: {size}")
+    print(f"size:     {size}")
+    print(f"commit:   Version {version}")
+    print(f"tag:      {version}")
     return 0
 
 
