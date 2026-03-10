@@ -1,13 +1,15 @@
 #pragma once
 
 #include <Arduino.h>
-#include <HardwareI2C.h>
+#include "api/HardwareI2C.h"
 
 namespace arduino {
 
 class MspM0TwoWire : public HardwareI2C {
 public:
     MspM0TwoWire();
+
+    using Print::write;
 
     void begin() override;
     void begin(uint8_t address) override;
@@ -30,10 +32,11 @@ public:
     int peek() override;
     void flush() override;
     size_t write(uint8_t data) override;
+    size_t write(int n) { return write(static_cast<uint8_t>(n)); }
     int availableForWrite() override;
 
 private:
-    static constexpr uint8_t kBufferSize = 16;
+    static constexpr uint8_t kBufferSize = 32;
 
     bool _begun;
     bool _busActive;
@@ -53,5 +56,8 @@ private:
 };
 
 } // namespace arduino
+
+using arduino::MspM0TwoWire;
+using TwoWire = arduino::MspM0TwoWire;
 
 extern arduino::MspM0TwoWire Wire;

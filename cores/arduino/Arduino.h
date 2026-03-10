@@ -1,7 +1,10 @@
 #pragma once
 
-#include "ArduinoAPI.h"
-#include "HardwareSerial.h"
+#include <string.h>
+
+#include "api/ArduinoAPI.h"
+#include "avr/dtostrf.h"
+#include "api/HardwareSerial.h"
 #include <variant.h>
 #include <pins_arduino.h>
 
@@ -19,6 +22,16 @@ void analogWriteResolution(int bits);
 #endif
 
 #ifdef __cplusplus
+inline void pinMode(pin_size_t pinNumber, int mode)
+{
+    pinMode(pinNumber, static_cast<PinMode>(mode));
+}
+
+inline void digitalWrite(pin_size_t pinNumber, int status)
+{
+    digitalWrite(pinNumber, static_cast<PinStatus>(status));
+}
+
 namespace arduino {
 class MspM0HardwareSerial;
 }

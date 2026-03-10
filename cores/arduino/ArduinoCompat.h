@@ -1,6 +1,8 @@
 #pragma once
 
-#include "ArduinoAPI.h"
+#include <string.h>
+
+#include "api/ArduinoAPI.h"
 #include <variant.h>
 
 #define SERIAL_PARITY_EVEN   (0x1ul)

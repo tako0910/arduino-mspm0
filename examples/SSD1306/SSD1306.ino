@@ -21,7 +21,7 @@ namespace {
 constexpr uint8_t kDisplayAddress = 0x3C;
 constexpr uint8_t kDisplayWidth = 128;
 constexpr uint8_t kDisplayPages = 4;
-constexpr uint8_t kWirePayloadLimit = 15;
+constexpr uint8_t kWirePayloadLimit = 31;
 
 constexpr uint8_t kGlyphSpace[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
 constexpr uint8_t kGlyphZero[5]  = {0x3E, 0x45, 0x49, 0x51, 0x3E};

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "HardwareSerial.h"
+#include <string.h>
+
+#include "api/HardwareSerial.h"
 
 #ifndef SERIAL_TX_BUFFER_SIZE
 #define SERIAL_TX_BUFFER_SIZE 16
@@ -16,6 +18,8 @@ class MspM0HardwareSerial : public HardwareSerial {
 public:
     MspM0HardwareSerial();
 
+    using Print::write;
+
     void begin(unsigned long baud) override;
     void begin(unsigned long baud, uint16_t config) override;
     void end() override;
@@ -24,6 +28,7 @@ public:
     int read(void) override;
     void flush(void) override;
     size_t write(uint8_t value) override;
+    size_t write(int n) { return write(static_cast<uint8_t>(n)); }
     operator bool() override;
 
     void handleInterrupt();

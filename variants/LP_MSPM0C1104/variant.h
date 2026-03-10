@@ -95,6 +95,26 @@ static inline int32_t digitalPinToInterrupt(uint8_t pin)
     return (pin < PINS_COUNT) ? (int32_t) pin : -1;
 }
 
+static inline uint8_t digitalPinToPort(uint8_t pin)
+{
+    return pin;
+}
+
+static inline volatile uint32_t *portOutputRegister(uint8_t port)
+{
+    return (port < PINS_COUNT) ? &g_APinDescription[port].gpio->DOUT31_0 : 0;
+}
+
+static inline volatile uint32_t *portInputRegister(uint8_t port)
+{
+    return (port < PINS_COUNT) ? (volatile uint32_t *) &g_APinDescription[port].gpio->DIN31_0 : 0;
+}
+
+static inline uint32_t digitalPinToBitMask(uint8_t pin)
+{
+    return (pin < PINS_COUNT) ? g_APinDescription[pin].pinMask : 0U;
+}
+
 void initVariant(void);
 
 #ifdef __cplusplus
