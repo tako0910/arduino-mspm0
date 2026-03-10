@@ -1,8 +1,6 @@
 #include "variant.h"
 
 #include <stdint.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 const PinDescription g_APinDescription[PINS_COUNT] = {
     {GPIOA, DL_GPIO_PIN_26, 26, IOMUX_PINCM27, 1, PWM_TIMER_TIMG8, 0, IOMUX_PINCM27_PF_TIMG8_CCP0, DL_GPIO_PIN_26_EDGE_DISABLE, DL_GPIO_PIN_26_EDGE_RISE, DL_GPIO_PIN_26_EDGE_FALL, DL_GPIO_PIN_26_EDGE_RISE_FALL},
@@ -24,79 +22,4 @@ const PinDescription g_APinDescription[PINS_COUNT] = {
 
 extern "C" void initVariant(void)
 {
-}
-
-extern "C" {
-extern char _end;
-extern uint32_t __StackTop;
-}
-
-extern "C" void _exit(int status)
-{
-    (void) status;
-    while (1) {
-    }
-}
-
-extern "C" int _close(int file)
-{
-    (void) file;
-    return -1;
-}
-
-extern "C" int _fstat(int file, struct stat *st)
-{
-    (void) file;
-    if (st != nullptr) {
-        st->st_mode = S_IFCHR;
-    }
-    return 0;
-}
-
-extern "C" int _isatty(int file)
-{
-    (void) file;
-    return 1;
-}
-
-extern "C" int _lseek(int file, int ptr, int dir)
-{
-    (void) file;
-    (void) ptr;
-    (void) dir;
-    return 0;
-}
-
-extern "C" int _read(int file, char *ptr, int len)
-{
-    (void) file;
-    (void) ptr;
-    (void) len;
-    return 0;
-}
-
-extern "C" int _write(int file, char *ptr, int len)
-{
-    (void) file;
-    (void) ptr;
-    return len;
-}
-
-extern "C" caddr_t _sbrk(int incr)
-{
-    static char *heap_end;
-    const uintptr_t limit = ((uintptr_t) &__StackTop) - 128U;
-    char *previous;
-
-    if (heap_end == nullptr) {
-        heap_end = &_end;
-    }
-
-    previous = heap_end;
-    if (((uintptr_t) (heap_end + incr)) > limit) {
-        return (caddr_t) -1;
-    }
-
-    heap_end += incr;
-    return (caddr_t) previous;
 }
