@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <HardwareSPI.h>
+#include "api/HardwareSPI.h"
 
 namespace arduino {
 

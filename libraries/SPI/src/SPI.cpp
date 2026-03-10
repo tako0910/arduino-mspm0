@@ -47,6 +47,17 @@ static DL_SPI_CLOCK_DIVIDE_RATIO spi_clock_divider_for_frequency(uint32_t freque
     return kDividers[divider - 1UL];
 }
 
+static DL_SPI_MODE spi_mode_for_bus_mode(arduino::SPIBusMode mode)
+{
+    switch (mode) {
+    case arduino::SPI_PERIPHERAL:
+        return DL_SPI_MODE_PERIPHERAL;
+    case arduino::SPI_CONTROLLER:
+    default:
+        return DL_SPI_MODE_CONTROLLER;
+    }
+}
+
 static void spi_drain_rx_fifo(void)
 {
     while (!DL_SPI_isRXFIFOEmpty(SPI0)) {
@@ -161,6 +172,7 @@ void MspM0SPI::applySettings(const SPISettings& settings)
 
     DL_SPI_disable(SPI0);
     DL_SPI_setClockConfig(SPI0, &clockConfig);
+    DL_SPI_setMode(SPI0, spi_mode_for_bus_mode(settings.getBusMode()));
     DL_SPI_setFrameFormat(SPI0, spi_frame_format_for_mode(settings.getDataMode()));
     DL_SPI_setBitOrder(SPI0, (settings.getBitOrder() == LSBFIRST) ?
         DL_SPI_BIT_ORDER_LSB_FIRST : DL_SPI_BIT_ORDER_MSB_FIRST);
