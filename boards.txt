@@ -27,3 +27,31 @@ lp_mspm0c1104.menu.serial_buffer.tiny.build.serial_rx_buffer=16
 lp_mspm0c1104.menu.serial_buffer.medium=Medium (TX:32 / RX:32)
 lp_mspm0c1104.menu.serial_buffer.medium.build.serial_tx_buffer=32
 lp_mspm0c1104.menu.serial_buffer.medium.build.serial_rx_buffer=32
+
+lp_mspm0g3507.name=LP-MSPM0G3507
+
+lp_mspm0g3507.upload.maximum_size=131072
+lp_mspm0g3507.upload.maximum_data_size=32768
+lp_mspm0g3507.upload.tool=openocd
+lp_mspm0g3507.upload.tool.default=openocd
+lp_mspm0g3507.upload.protocol=swd
+
+lp_mspm0g3507.build.mcu=MSPM0G3507
+lp_mspm0g3507.build.f_cpu=32000000L
+lp_mspm0g3507.build.board=LP_MSPM0G3507
+lp_mspm0g3507.build.core=arduino
+lp_mspm0g3507.build.variant=LP_MSPM0G3507
+lp_mspm0g3507.build.ldscript=mspm0g3507.lds
+lp_mspm0g3507.build.extra_flags=-D__MSPM0G3507__ -DARDUINO_ARCH_MSPM0 -DCONFIG_LP_MSPM0G3507
+lp_mspm0g3507.build.serial_tx_buffer=32
+lp_mspm0g3507.build.serial_rx_buffer=32
+
+lp_mspm0g3507.menu.serial_buffer.small=Small (TX:16 / RX:16)
+lp_mspm0g3507.menu.serial_buffer.small.build.serial_tx_buffer=16
+lp_mspm0g3507.menu.serial_buffer.small.build.serial_rx_buffer=16
+lp_mspm0g3507.menu.serial_buffer.medium=Medium (TX:32 / RX:32)
+lp_mspm0g3507.menu.serial_buffer.medium.build.serial_tx_buffer=32
+lp_mspm0g3507.menu.serial_buffer.medium.build.serial_rx_buffer=32
+lp_mspm0g3507.menu.serial_buffer.large=Large (TX:64 / RX:64)
+lp_mspm0g3507.menu.serial_buffer.large.build.serial_tx_buffer=64
+lp_mspm0g3507.menu.serial_buffer.large.build.serial_rx_buffer=64

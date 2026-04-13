@@ -1,9 +1,9 @@
 /*
   Blink
 
-  Blinks the LP-MSPM0C1104 onboard LED using LED_BUILTIN.
-  The LaunchPad LED on PA22 is active-low, so LOW turns the LED on
-  and HIGH turns it off.
+  Blinks the onboard LED using LED_BUILTIN.
+  On both LP-MSPM0C1104 and LP-MSPM0G3507 the default LaunchPad LED is
+  wired active-low, so LOW turns the LED on and HIGH turns it off.
 */
 
 void setup() {

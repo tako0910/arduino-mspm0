@@ -133,6 +133,7 @@ static void init_pwm_timer_g8(void)
     initialized = true;
 }
 
+#if MSPM0_HAS_PWM_TIMG14
 static void init_pwm_timer_g14(void)
 {
     static bool initialized;
@@ -183,6 +184,7 @@ static void init_pwm_timer_g14(void)
     DL_TimerG_startCounter(TIMG14);
     initialized = true;
 }
+#endif
 
 static void init_pwm_timer_a0(void)
 {
@@ -265,16 +267,16 @@ int analogRead(pin_size_t pin)
     mspm0_adc_init();
     configure_vref(s_analog_reference);
     DL_GPIO_setAnalogInternalResistor(g_APinDescription[pin].pincm, DL_GPIO_RESISTOR_NONE);
-    DL_ADC12_configConversionMem(ADC0, DL_ADC12_MEM_IDX_0, adc_input_for_channel(channel),
+    DL_ADC12_configConversionMem(MSPM0_ADC_INST, DL_ADC12_MEM_IDX_0, adc_input_for_channel(channel),
         adc_reference_for_mode(s_analog_reference), DL_ADC12_SAMPLE_TIMER_SOURCE_SCOMP0,
         DL_ADC12_AVERAGING_MODE_DISABLED, DL_ADC12_BURN_OUT_SOURCE_DISABLED,
         DL_ADC12_TRIGGER_MODE_AUTO_NEXT, DL_ADC12_WINDOWS_COMP_MODE_DISABLED);
-    DL_ADC12_clearInterruptStatus(ADC0, DL_ADC12_INTERRUPT_MEM0_RESULT_LOADED);
-    DL_ADC12_startConversion(ADC0);
-    while ((DL_ADC12_getRawInterruptStatus(ADC0, DL_ADC12_INTERRUPT_MEM0_RESULT_LOADED) &
+    DL_ADC12_clearInterruptStatus(MSPM0_ADC_INST, DL_ADC12_INTERRUPT_MEM0_RESULT_LOADED);
+    DL_ADC12_startConversion(MSPM0_ADC_INST);
+    while ((DL_ADC12_getRawInterruptStatus(MSPM0_ADC_INST, DL_ADC12_INTERRUPT_MEM0_RESULT_LOADED) &
            DL_ADC12_INTERRUPT_MEM0_RESULT_LOADED) == 0U) {
     }
-    result = DL_ADC12_getMemResult(ADC0, DL_ADC12_MEM_IDX_0);
+    result = DL_ADC12_getMemResult(MSPM0_ADC_INST, DL_ADC12_MEM_IDX_0);
     return (int) scale_resolution(result, 12U, s_adc_resolution);
 }
 
@@ -352,9 +354,12 @@ void analogWrite(pin_size_t pin, int value)
         init_pwm_timer_a0();
         DL_GPIO_initPeripheralOutputFunction(desc->pincm, desc->pwmFunction);
         DL_TimerA_setCaptureCompareValue(TIMA0, duty, (DL_TIMER_CC_INDEX) desc->pwmChannel);
-    } else if (desc->pwmTimer == PWM_TIMER_TIMG14) {
+    }
+#if MSPM0_HAS_PWM_TIMG14
+    else if (desc->pwmTimer == PWM_TIMER_TIMG14) {
         init_pwm_timer_g14();
         DL_GPIO_initPeripheralOutputFunction(desc->pincm, desc->pwmFunction);
         DL_TimerG_setCaptureCompareValue(TIMG14, duty, (DL_TIMER_CC_INDEX) desc->pwmChannel);
     }
+#endif
 }

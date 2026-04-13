@@ -10,7 +10,7 @@ static bool i2c_wait_until_clear(uint32_t mask)
 {
     uint32_t timeout = kI2CTimeoutCycles;
 
-    while ((DL_I2C_getControllerStatus(I2C0) & mask) != 0U) {
+    while ((DL_I2C_getControllerStatus(MSPM0_WIRE_INST) & mask) != 0U) {
         if (--timeout == 0U) {
             return false;
         }
@@ -23,7 +23,7 @@ static bool i2c_wait_until_set(uint32_t mask)
 {
     uint32_t timeout = kI2CTimeoutCycles;
 
-    while ((DL_I2C_getControllerStatus(I2C0) & mask) == 0U) {
+    while ((DL_I2C_getControllerStatus(MSPM0_WIRE_INST) & mask) == 0U) {
         if (--timeout == 0U) {
             return false;
         }
@@ -69,7 +69,7 @@ void MspM0TwoWire::begin(uint8_t address)
 
 void MspM0TwoWire::end()
 {
-    DL_I2C_disableController(I2C0);
+    DL_I2C_disableController(MSPM0_WIRE_INST);
     _begun = false;
     _busActive = false;
 }
@@ -108,21 +108,21 @@ uint8_t MspM0TwoWire::endTransmission(bool stopBit)
         return 5U;
     }
 
-    DL_I2C_flushControllerTXFIFO(I2C0);
-    DL_I2C_startControllerTransferAdvanced(I2C0, _txAddress,
+    DL_I2C_flushControllerTXFIFO(MSPM0_WIRE_INST);
+    DL_I2C_startControllerTransferAdvanced(MSPM0_WIRE_INST, _txAddress,
         DL_I2C_CONTROLLER_DIRECTION_TX, _txLength,
         DL_I2C_CONTROLLER_START_ENABLE,
         stopBit ? DL_I2C_CONTROLLER_STOP_ENABLE : DL_I2C_CONTROLLER_STOP_DISABLE,
         DL_I2C_CONTROLLER_ACK_ENABLE);
 
     while (sent < _txLength) {
-        status = DL_I2C_getControllerStatus(I2C0);
+        status = DL_I2C_getControllerStatus(MSPM0_WIRE_INST);
         if ((status & DL_I2C_CONTROLLER_STATUS_ERROR) != 0U) {
             _busActive = false;
             return transferError();
         }
-        if (!DL_I2C_isControllerTXFIFOFull(I2C0)) {
-            DL_I2C_transmitControllerData(I2C0, _txBuffer[sent++]);
+        if (!DL_I2C_isControllerTXFIFOFull(MSPM0_WIRE_INST)) {
+            DL_I2C_transmitControllerData(MSPM0_WIRE_INST, _txBuffer[sent++]);
         }
     }
 
@@ -131,7 +131,7 @@ uint8_t MspM0TwoWire::endTransmission(bool stopBit)
         return 5U;
     }
 
-    status = DL_I2C_getControllerStatus(I2C0);
+    status = DL_I2C_getControllerStatus(MSPM0_WIRE_INST);
     _busActive = !stopBit;
     if ((status & DL_I2C_CONTROLLER_STATUS_ERROR) != 0U) {
         _busActive = false;
@@ -174,8 +174,8 @@ size_t MspM0TwoWire::requestFrom(uint8_t address, size_t len, bool stopBit)
         return 0U;
     }
 
-    DL_I2C_flushControllerRXFIFO(I2C0);
-    DL_I2C_startControllerTransferAdvanced(I2C0, address,
+    DL_I2C_flushControllerRXFIFO(MSPM0_WIRE_INST);
+    DL_I2C_startControllerTransferAdvanced(MSPM0_WIRE_INST, address,
         DL_I2C_CONTROLLER_DIRECTION_RX, (uint16_t) len,
         DL_I2C_CONTROLLER_START_ENABLE,
         stopBit ? DL_I2C_CONTROLLER_STOP_ENABLE : DL_I2C_CONTROLLER_STOP_DISABLE,
@@ -183,8 +183,8 @@ size_t MspM0TwoWire::requestFrom(uint8_t address, size_t len, bool stopBit)
 
     for (index = 0; index < len; ++index) {
         uint32_t timeout = kI2CTimeoutCycles;
-        while (DL_I2C_isControllerRXFIFOEmpty(I2C0)) {
-            status = DL_I2C_getControllerStatus(I2C0);
+        while (DL_I2C_isControllerRXFIFOEmpty(MSPM0_WIRE_INST)) {
+            status = DL_I2C_getControllerStatus(MSPM0_WIRE_INST);
             if ((status & DL_I2C_CONTROLLER_STATUS_ERROR) != 0U) {
                 _busActive = false;
                 return _rxLength;
@@ -194,7 +194,7 @@ size_t MspM0TwoWire::requestFrom(uint8_t address, size_t len, bool stopBit)
                 return _rxLength;
             }
         }
-        _rxBuffer[_rxLength++] = DL_I2C_receiveControllerData(I2C0);
+        _rxBuffer[_rxLength++] = DL_I2C_receiveControllerData(MSPM0_WIRE_INST);
     }
 
     if (!waitControllerReady()) {
@@ -202,7 +202,7 @@ size_t MspM0TwoWire::requestFrom(uint8_t address, size_t len, bool stopBit)
         return _rxLength;
     }
 
-    status = DL_I2C_getControllerStatus(I2C0);
+    status = DL_I2C_getControllerStatus(MSPM0_WIRE_INST);
     _busActive = !stopBit;
     if ((status & DL_I2C_CONTROLLER_STATUS_ERROR) != 0U) {
         _busActive = false;
@@ -280,7 +280,7 @@ bool MspM0TwoWire::waitControllerIdle() const
 
 uint8_t MspM0TwoWire::transferError() const
 {
-    uint32_t status = DL_I2C_getControllerStatus(I2C0);
+    uint32_t status = DL_I2C_getControllerStatus(MSPM0_WIRE_INST);
 
     if ((status & DL_I2C_CONTROLLER_STATUS_ARBITRATION_LOST) != 0U) {
         return 4U;

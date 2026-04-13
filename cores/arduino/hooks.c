@@ -1,7 +1,7 @@
 #include "ArduinoCompat.h"
 #include "MspM0Core.h"
 
-uint32_t SystemCoreClock = MSPM0_F_CPU;
+uint32_t SystemCoreClock = F_CPU;
 
 extern void _exit(int status);
 

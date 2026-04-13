@@ -6,7 +6,7 @@ volatile uint32_t g_millis_count;
 static void delay_ms_busy(unsigned long ms)
 {
     while (ms-- > 0UL) {
-        delay_cycles(MSPM0_F_CPU / 1000UL);
+        delay_cycles(F_CPU / 1000UL);
     }
 }
 
@@ -75,7 +75,7 @@ void delayMicroseconds(unsigned int us)
     if (us == 0U) {
         return;
     }
-    delay_cycles((uint32_t) us * (MSPM0_F_CPU / 1000000UL));
+    delay_cycles((uint32_t) us * (F_CPU / 1000000UL));
 }
 
 unsigned long pulseIn(pin_size_t pin, uint8_t state, unsigned long timeout)

@@ -16,7 +16,10 @@ import tempfile
 
 PACKAGE_NAME = "ti"
 ARCHITECTURE = "mspm0"
-BOARD_NAME = "LP-MSPM0C1104"
+BOARD_NAMES = (
+    "LP-MSPM0C1104",
+    "LP-MSPM0G3507",
+)
 DEFAULT_GCC_VERSION = "15.2.1-1.1"
 DEFAULT_OPENOCD_VERSION = "0.12.0-7"
 TOOL_RELEASES = {
@@ -332,7 +335,7 @@ def build_index(
                 "archiveFileName": archive_name,
                 "checksum": f"SHA-256:{checksum}",
                 "size": size,
-                "boards": [{"name": BOARD_NAME}],
+                "boards": [{"name": board_name} for board_name in BOARD_NAMES],
                 "toolsDependencies": [
                     {
                         "packager": PACKAGE_NAME,

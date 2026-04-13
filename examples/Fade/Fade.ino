@@ -1,8 +1,9 @@
 /*
   Fade
 
-  Fades the LP-MSPM0C1104 onboard LED using PWM on LED_BUILTIN.
-  The LaunchPad LED on PA22 is active-low, so the PWM duty is inverted here.
+  Fades the onboard LED using PWM on LED_BUILTIN.
+  On both LP-MSPM0C1104 and LP-MSPM0G3507 the default LaunchPad LED is
+  active-low, so the PWM duty is inverted here.
   This sketch keeps the duty between 1 and 254 to avoid the visible
   mode-switch artifact at the 0%/100% endpoints.
 */

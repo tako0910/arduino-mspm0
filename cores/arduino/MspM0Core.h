@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-#define MSPM0_F_CPU 24000000UL
 #define INVALID_ANALOG_CHANNEL 0xFFu
 
 void mspm0_core_init(void);

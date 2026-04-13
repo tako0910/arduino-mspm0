@@ -4,8 +4,8 @@ Arduino core for Texas Instruments MSPM0 series MCUs.
 
 ## Supported Hardware
 
-This repository currently supports `LP-MSPM0C1104` only.
-You can also program a standalone `MSPM0C1104` IC via SWD using a
+This repository currently supports `LP-MSPM0C1104` and `LP-MSPM0G3507`.
+You can also program standalone `MSPM0C1104` or `MSPM0G3507` ICs via SWD using a
 CMSIS-DAP or other debug probe.
 
 ## Limitations
@@ -33,7 +33,7 @@ https://raw.githubusercontent.com/tako0910/arduino-mspm0/master/package_ti_mspm0
 
 ## Upload
 
-Upload uses OpenOCD over SWD. The LP-MSPM0C1104 LaunchPad has an onboard
+Upload uses OpenOCD over SWD. The LaunchPad boards have an onboard
 XDS110 debug probe that works out of the box:
 
 To use a different SWD probe, select a programmer under
@@ -54,6 +54,8 @@ The board definition currently provides these menus:
   - `Medium (TX:32 / RX:32)`
 
 ## Pin Mapping
+
+### LP-MSPM0C1104
 
 | Arduino | MCU pin | Notes |
 | --- | --- | --- |
@@ -86,6 +88,43 @@ Defaults:
   - MISO: `D10` (`PA4`)
   - SCK: `D4` (`PA6`)
 - `LED_BUILTIN`: `D5` (`PA22`)
+
+### LP-MSPM0G3507
+
+| Arduino | MCU pin | Notes |
+| --- | --- | --- |
+| `D0` | `PA11` | `Serial RX` |
+| `D1` | `PA10` | `Serial TX` |
+| `D2` | `PA18` | user button |
+| `D3` | `PA0` | `LED_BUILTIN`, PWM |
+| `D4` | `PA1` | PWM |
+| `D5` | `PB21` | user button |
+| `D6` | `PB22` | blue LED, PWM |
+| `D7` | `PB26` | red LED, PWM |
+| `D8` | `PB27` | green LED |
+| `D9` | `PB2` | `Wire SCL` |
+| `D10` | `PB3` | `Wire SDA` |
+| `D11` | `PB6` | `SPI SS`, PWM |
+| `D12` | `PB7` | `SPI MISO`, PWM |
+| `D13` | `PB8` | `SPI MOSI`, PWM |
+| `D14` | `PB9` | `SPI SCK`, PWM |
+| `D15` | `PA25` | `A0` |
+| `D16` | `PB25` | `A1` |
+
+Defaults:
+
+- `Serial`
+  - RX: `D0` (`PA11`)
+  - TX: `D1` (`PA10`)
+- `Wire`
+  - SDA: `D10` (`PB3`)
+  - SCL: `D9` (`PB2`)
+- `SPI`
+  - MOSI: `D13` (`PB8`)
+  - MISO: `D12` (`PB7`)
+  - SCK: `D14` (`PB9`)
+  - SS: `D11` (`PB6`)
+- `LED_BUILTIN`: `D3` (`PA0`)
 
 ## AI Usage
 

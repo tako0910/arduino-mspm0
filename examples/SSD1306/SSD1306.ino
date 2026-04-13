@@ -8,6 +8,10 @@
   Wiring on LP-MSPM0C1104:
   - OLED SDA -> D7 / PA0
   - OLED SCL -> D6 / PA11
+
+  Wiring on LP-MSPM0G3507:
+  - OLED SDA -> D10 / PB3
+  - OLED SCL -> D9 / PB2
   - OLED VCC -> 3V3
   - OLED GND -> GND
 

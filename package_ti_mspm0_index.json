@@ -20,6 +20,9 @@
           "boards": [
             {
               "name": "LP-MSPM0C1104"
+            },
+            {
+              "name": "LP-MSPM0G3507"
             }
           ],
           "toolsDependencies": [

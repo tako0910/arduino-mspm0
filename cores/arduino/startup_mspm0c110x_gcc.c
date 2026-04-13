@@ -1,3 +1,4 @@
+#if defined(__MSPM0C1104__)
 /*****************************************************************************
 
   Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
@@ -205,3 +206,4 @@ void Default_Handler(void)
     {
     }
 }
+#endif

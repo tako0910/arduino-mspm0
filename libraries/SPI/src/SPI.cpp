@@ -37,7 +37,7 @@ static DL_SPI_CLOCK_DIVIDE_RATIO spi_clock_divider_for_frequency(uint32_t freque
         return DL_SPI_CLOCK_DIVIDE_RATIO_8;
     }
 
-    divider = (MSPM0_F_CPU + frequency - 1UL) / frequency;
+    divider = (F_CPU + frequency - 1UL) / frequency;
     if (divider < 1UL) {
         divider = 1UL;
     } else if (divider > 8UL) {
@@ -60,8 +60,8 @@ static DL_SPI_MODE spi_mode_for_bus_mode(arduino::SPIBusMode mode)
 
 static void spi_drain_rx_fifo(void)
 {
-    while (!DL_SPI_isRXFIFOEmpty(SPI0)) {
-        (void) DL_SPI_receiveData8(SPI0);
+    while (!DL_SPI_isRXFIFOEmpty(MSPM0_SPI_INST)) {
+        (void) DL_SPI_receiveData8(MSPM0_SPI_INST);
     }
 }
 
@@ -84,7 +84,7 @@ void MspM0SPI::begin()
 
 void MspM0SPI::end()
 {
-    DL_SPI_disable(SPI0);
+    DL_SPI_disable(MSPM0_SPI_INST);
     _begun = false;
 }
 
@@ -95,8 +95,8 @@ uint8_t MspM0SPI::transfer(uint8_t data)
     }
 
     spi_drain_rx_fifo();
-    DL_SPI_transmitDataBlocking8(SPI0, data);
-    return DL_SPI_receiveDataBlocking8(SPI0);
+    DL_SPI_transmitDataBlocking8(MSPM0_SPI_INST, data);
+    return DL_SPI_receiveDataBlocking8(MSPM0_SPI_INST);
 }
 
 uint16_t MspM0SPI::transfer16(uint16_t data)
@@ -108,16 +108,16 @@ uint16_t MspM0SPI::transfer16(uint16_t data)
         begin();
     }
 
-    priorSize = DL_SPI_getDataSize(SPI0);
-    DL_SPI_disable(SPI0);
-    DL_SPI_setDataSize(SPI0, DL_SPI_DATA_SIZE_16);
-    DL_SPI_enable(SPI0);
+    priorSize = DL_SPI_getDataSize(MSPM0_SPI_INST);
+    DL_SPI_disable(MSPM0_SPI_INST);
+    DL_SPI_setDataSize(MSPM0_SPI_INST, DL_SPI_DATA_SIZE_16);
+    DL_SPI_enable(MSPM0_SPI_INST);
     spi_drain_rx_fifo();
-    DL_SPI_transmitDataBlocking16(SPI0, data);
-    result = DL_SPI_receiveDataBlocking16(SPI0);
-    DL_SPI_disable(SPI0);
-    DL_SPI_setDataSize(SPI0, priorSize);
-    DL_SPI_enable(SPI0);
+    DL_SPI_transmitDataBlocking16(MSPM0_SPI_INST, data);
+    result = DL_SPI_receiveDataBlocking16(MSPM0_SPI_INST);
+    DL_SPI_disable(MSPM0_SPI_INST);
+    DL_SPI_setDataSize(MSPM0_SPI_INST, priorSize);
+    DL_SPI_enable(MSPM0_SPI_INST);
     return result;
 }
 
@@ -170,15 +170,15 @@ void MspM0SPI::applySettings(const SPISettings& settings)
 
     _settings = settings;
 
-    DL_SPI_disable(SPI0);
-    DL_SPI_setClockConfig(SPI0, &clockConfig);
-    DL_SPI_setMode(SPI0, spi_mode_for_bus_mode(settings.getBusMode()));
-    DL_SPI_setFrameFormat(SPI0, spi_frame_format_for_mode(settings.getDataMode()));
-    DL_SPI_setBitOrder(SPI0, (settings.getBitOrder() == LSBFIRST) ?
+    DL_SPI_disable(MSPM0_SPI_INST);
+    DL_SPI_setClockConfig(MSPM0_SPI_INST, &clockConfig);
+    DL_SPI_setMode(MSPM0_SPI_INST, spi_mode_for_bus_mode(settings.getBusMode()));
+    DL_SPI_setFrameFormat(MSPM0_SPI_INST, spi_frame_format_for_mode(settings.getDataMode()));
+    DL_SPI_setBitOrder(MSPM0_SPI_INST, (settings.getBitOrder() == LSBFIRST) ?
         DL_SPI_BIT_ORDER_LSB_FIRST : DL_SPI_BIT_ORDER_MSB_FIRST);
-    DL_SPI_setChipSelect(SPI0, DL_SPI_CHIP_SELECT_NONE);
-    DL_SPI_setDataSize(SPI0, DL_SPI_DATA_SIZE_8);
-    DL_SPI_enable(SPI0);
+    DL_SPI_setChipSelect(MSPM0_SPI_INST, DL_SPI_CHIP_SELECT_NONE);
+    DL_SPI_setDataSize(MSPM0_SPI_INST, DL_SPI_DATA_SIZE_8);
+    DL_SPI_enable(MSPM0_SPI_INST);
 }
 
 } // namespace arduino

@@ -29,20 +29,20 @@ void MspM0HardwareSerial::begin(unsigned long baud, uint16_t config)
     _txTail = 0;
 #endif
     mspm0_uart0_init(baud, config);
-    DL_UART_enableFIFOs(UART0);
-    DL_UART_setRXFIFOThreshold(UART0, DL_UART_RX_FIFO_LEVEL_ONE_ENTRY);
-    DL_UART_setTXFIFOThreshold(UART0, DL_UART_TX_FIFO_LEVEL_EMPTY);
-    DL_UART_clearInterruptStatus(UART0, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_TX);
-    NVIC_ClearPendingIRQ(UART0_INT_IRQn);
-    NVIC_EnableIRQ(UART0_INT_IRQn);
+    DL_UART_enableFIFOs(MSPM0_SERIAL_INST);
+    DL_UART_setRXFIFOThreshold(MSPM0_SERIAL_INST, DL_UART_RX_FIFO_LEVEL_ONE_ENTRY);
+    DL_UART_setTXFIFOThreshold(MSPM0_SERIAL_INST, DL_UART_TX_FIFO_LEVEL_EMPTY);
+    DL_UART_clearInterruptStatus(MSPM0_SERIAL_INST, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_TX);
+    NVIC_ClearPendingIRQ(MSPM0_SERIAL_INT_IRQN);
+    NVIC_EnableIRQ(MSPM0_SERIAL_INT_IRQN);
     _begun = true;
 }
 
 void MspM0HardwareSerial::end()
 {
-    DL_UART_disableInterrupt(UART0, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_TX);
-    NVIC_DisableIRQ(UART0_INT_IRQn);
-    DL_UART_Main_disable(UART0);
+    DL_UART_disableInterrupt(MSPM0_SERIAL_INST, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_TX);
+    NVIC_DisableIRQ(MSPM0_SERIAL_INT_IRQN);
+    DL_UART_Main_disable(MSPM0_SERIAL_INST);
     _head = 0;
     _tail = 0;
 #if SERIAL_TX_BUFFER_SIZE > 0
@@ -83,7 +83,7 @@ void MspM0HardwareSerial::flush(void)
         yield();
     }
 #endif
-    while (DL_UART_Main_isBusy(UART0)) {
+    while (DL_UART_Main_isBusy(MSPM0_SERIAL_INST)) {
     }
 }
 
@@ -101,10 +101,10 @@ size_t MspM0HardwareSerial::write(uint8_t value)
         _txBuffer[_txHead] = value;
         _txHead = nextHead;
         flushTxFifo();
-        DL_UART_enableInterrupt(UART0, DL_UART_INTERRUPT_TX);
+        DL_UART_enableInterrupt(MSPM0_SERIAL_INST, DL_UART_INTERRUPT_TX);
     }
 #else
-    DL_UART_Main_transmitDataBlocking(UART0, value);
+    DL_UART_Main_transmitDataBlocking(MSPM0_SERIAL_INST, value);
 #endif
     return 1;
 }
@@ -127,34 +127,34 @@ void MspM0HardwareSerial::pushByte(uint8_t value)
 #if SERIAL_TX_BUFFER_SIZE > 0
 void MspM0HardwareSerial::flushTxFifo(void)
 {
-    while ((_txHead != _txTail) && !DL_UART_isTXFIFOFull(UART0)) {
-        DL_UART_transmitData(UART0, _txBuffer[_txTail]);
+    while ((_txHead != _txTail) && !DL_UART_isTXFIFOFull(MSPM0_SERIAL_INST)) {
+        DL_UART_transmitData(MSPM0_SERIAL_INST, _txBuffer[_txTail]);
         _txTail = (uint8_t) ((_txTail + 1U) % SERIAL_TX_BUFFER_SIZE);
     }
     if (_txHead == _txTail) {
-        DL_UART_disableInterrupt(UART0, DL_UART_INTERRUPT_TX);
+        DL_UART_disableInterrupt(MSPM0_SERIAL_INST, DL_UART_INTERRUPT_TX);
     }
 }
 #endif
 
 void MspM0HardwareSerial::handleInterrupt()
 {
-    DL_UART_IIDX pending = DL_UART_getPendingInterrupt(UART0);
+    DL_UART_IIDX pending = DL_UART_getPendingInterrupt(MSPM0_SERIAL_INST);
     if (pending == DL_UART_IIDX_RX) {
-        while (!DL_UART_isRXFIFOEmpty(UART0)) {
-            pushByte((uint8_t) DL_UART_receiveData(UART0));
+        while (!DL_UART_isRXFIFOEmpty(MSPM0_SERIAL_INST)) {
+            pushByte((uint8_t) DL_UART_receiveData(MSPM0_SERIAL_INST));
         }
-        DL_UART_clearInterruptStatus(UART0, DL_UART_INTERRUPT_RX);
+        DL_UART_clearInterruptStatus(MSPM0_SERIAL_INST, DL_UART_INTERRUPT_RX);
     }
 #if SERIAL_TX_BUFFER_SIZE > 0
     else if (pending == DL_UART_IIDX_TX) {
         flushTxFifo();
-        DL_UART_clearInterruptStatus(UART0, DL_UART_INTERRUPT_TX);
+        DL_UART_clearInterruptStatus(MSPM0_SERIAL_INST, DL_UART_INTERRUPT_TX);
     }
 #endif
 }
 
-extern "C" void UART0_IRQHandler(void)
+extern "C" void MSPM0_SERIAL_IRQHandler(void)
 {
     SerialImpl.handleInterrupt();
 }

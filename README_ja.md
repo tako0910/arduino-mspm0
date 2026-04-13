@@ -4,8 +4,8 @@ Texas Instruments MSPM0 シリーズ MCU 向けの Arduino core です。
 
 ## 対応ハードウェア
 
-現在、このリポジトリが対応しているのは `LP-MSPM0C1104` のみです。
-CMSIS-DAP 等の SWD プローブを使用すれば、単体の `MSPM0C1104` IC への
+現在、このリポジトリは `LP-MSPM0C1104` と `LP-MSPM0G3507` に対応しています。
+CMSIS-DAP 等の SWD プローブを使用すれば、単体の `MSPM0C1104` や `MSPM0G3507` IC への
 書き込みも可能です。
 
 ## 制約事項
@@ -33,9 +33,8 @@ https://raw.githubusercontent.com/tako0910/arduino-mspm0/master/package_ti_mspm0
 
 ## 書き込み
 
-書き込みは OpenOCD を使用し、SWD 経由で行います。LP-MSPM0C1104 LaunchPad
-にはオンボードの XDS110 デバッグプローブが搭載されており、そのまま使用
-できます。
+書き込みは OpenOCD を使用し、SWD 経由で行います。LaunchPad にはオンボード
+の XDS110 デバッグプローブが搭載されており、そのまま使用できます。
 
 別の SWD プローブを使用する場合は `ツール > 書き込み装置` でプログラマを
 選択し、`スケッチ > 書き込み装置を使って書き込み` から書き込んでください。
@@ -55,6 +54,8 @@ https://raw.githubusercontent.com/tako0910/arduino-mspm0/master/package_ti_mspm0
   - `Medium (TX:32 / RX:32)`
 
 ## ピンマッピング
+
+### LP-MSPM0C1104
 
 | Arduino | MCU pin | 用途 |
 | --- | --- | --- |
@@ -87,6 +88,43 @@ https://raw.githubusercontent.com/tako0910/arduino-mspm0/master/package_ti_mspm0
   - MISO: `D10` (`PA4`)
   - SCK: `D4` (`PA6`)
 - `LED_BUILTIN`: `D5` (`PA22`)
+
+### LP-MSPM0G3507
+
+| Arduino | MCU pin | 用途 |
+| --- | --- | --- |
+| `D0` | `PA11` | `Serial RX` |
+| `D1` | `PA10` | `Serial TX` |
+| `D2` | `PA18` | ユーザボタン |
+| `D3` | `PA0` | `LED_BUILTIN`, PWM |
+| `D4` | `PA1` | PWM |
+| `D5` | `PB21` | ユーザボタン |
+| `D6` | `PB22` | 青 LED, PWM |
+| `D7` | `PB26` | 赤 LED, PWM |
+| `D8` | `PB27` | 緑 LED |
+| `D9` | `PB2` | `Wire SCL` |
+| `D10` | `PB3` | `Wire SDA` |
+| `D11` | `PB6` | `SPI SS`, PWM |
+| `D12` | `PB7` | `SPI MISO`, PWM |
+| `D13` | `PB8` | `SPI MOSI`, PWM |
+| `D14` | `PB9` | `SPI SCK`, PWM |
+| `D15` | `PA25` | `A0` |
+| `D16` | `PB25` | `A1` |
+
+デフォルト割り当て:
+
+- `Serial`
+  - RX: `D0` (`PA11`)
+  - TX: `D1` (`PA10`)
+- `Wire`
+  - SDA: `D10` (`PB3`)
+  - SCL: `D9` (`PB2`)
+- `SPI`
+  - MOSI: `D13` (`PB8`)
+  - MISO: `D12` (`PB7`)
+  - SCK: `D14` (`PB9`)
+  - SS: `D11` (`PB6`)
+- `LED_BUILTIN`: `D3` (`PA0`)
 
 ## AI の利用
 
