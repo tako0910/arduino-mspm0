@@ -1,6 +1,7 @@
 # Editor and local tooling settings
 .vscode
 .claude
+.codex
 
 # OS-generated files
 .DS_Store
