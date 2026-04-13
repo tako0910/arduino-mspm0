@@ -108,8 +108,34 @@ Defaults:
 | `D12` | `PB7` | `SPI MISO`, PWM |
 | `D13` | `PB8` | `SPI MOSI`, PWM |
 | `D14` | `PB9` | `SPI SCK`, PWM |
-| `D15` | `PA25` | `A0` |
-| `D16` | `PB25` | `A1` |
+| `D15` | `PA25` | `A2`, PWM |
+| `D16` | `PB25` | `A4` |
+| `D17` | `PA26` | `A1` |
+| `D18` | `PA27` | `A0` |
+| `D19` | `PA9` | BoosterPack header |
+| `D20` | `PB23` | BoosterPack header |
+| `D21` | `PA8` | BoosterPack header |
+| `D22` | `PB15` | BoosterPack header |
+| `D23` | `PB17` | BoosterPack header |
+| `D24` | `PB12` | BoosterPack header |
+| `D25` | `PB24` | BoosterPack header, `A5` |
+| `D26` | `PB0` | BoosterPack header |
+| `D27` | `PB1` | BoosterPack header |
+| `D28` | `PB4` | BoosterPack header |
+| `D29` | `PB16` | BoosterPack header |
+| `D30` | `PB19` | BoosterPack header |
+| `D31` | `PA28` | BoosterPack header |
+| `D32` | `PA22` | BoosterPack header, `A7` |
+| `D33` | `PA31` | BoosterPack header |
+| `D34` | `PB18` | BoosterPack header |
+| `D35` | `PB20` | BoosterPack header, `A6` |
+| `D36` | `PB13` | BoosterPack header |
+| `D37` | `PA24` | BoosterPack header, `A3` |
+| `D38` | `PA17` | BoosterPack header |
+| `D39` | `PA16` | BoosterPack header |
+| `D40` | `PA12` | BoosterPack header |
+| `D41` | `PA13` | BoosterPack header |
+| `D42` | `PA15` | BoosterPack header |
 
 Defaults:
 

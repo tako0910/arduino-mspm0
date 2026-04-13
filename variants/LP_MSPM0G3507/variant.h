@@ -34,9 +34,9 @@ typedef struct {
 
 extern const PinDescription g_APinDescription[];
 
-#define PINS_COUNT           (17u)
-#define NUM_DIGITAL_PINS     (17u)
-#define NUM_ANALOG_INPUTS    (2u)
+#define PINS_COUNT           (43u)
+#define NUM_DIGITAL_PINS     (43u)
+#define NUM_ANALOG_INPUTS    (8u)
 
 #define PIN_SERIAL_RX        (0u)
 #define PIN_SERIAL_TX        (1u)
@@ -74,14 +74,26 @@ extern const PinDescription g_APinDescription[];
 
 #define MSPM0_HAS_PWM_TIMG14    0
 
-#define PIN_A0               (15u)  /* PA25, ADC0 channel 2 */
-#define PIN_A1               (16u)  /* PB25, ADC0 channel 4 */
+#define PIN_A0               (18u)  /* PA27, ADC0 channel 0 */
+#define PIN_A1               (17u)  /* PA26, ADC0 channel 1 */
+#define PIN_A2               (15u)  /* PA25, ADC0 channel 2 */
+#define PIN_A3               (37u)  /* PA24, ADC0 channel 3 */
+#define PIN_A4               (16u)  /* PB25, ADC0 channel 4 */
+#define PIN_A5               (25u)  /* PB24, ADC0 channel 5 */
+#define PIN_A6               (35u)  /* PB20, ADC0 channel 6 */
+#define PIN_A7               (32u)  /* PA22, ADC0 channel 7 */
 
 static inline uint8_t analogInputToDigitalPin(uint8_t analogPin)
 {
     switch (analogPin) {
     case 0: return PIN_A0;
     case 1: return PIN_A1;
+    case 2: return PIN_A2;
+    case 3: return PIN_A3;
+    case 4: return PIN_A4;
+    case 5: return PIN_A5;
+    case 6: return PIN_A6;
+    case 7: return PIN_A7;
     default: return 0xFFu;
     }
 }
